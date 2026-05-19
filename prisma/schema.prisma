@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// model User {
+//   id    Int     @id @default(autoincrement())
+//   email String  @unique
+//   name  String?
+//   posts Post[]
+// }
+
+// model Post {
+//   id        Int     @id @default(autoincrement())
+//   title     String
+//   content   String?
+//   published Boolean @default(false)
+//   author    User    @relation(fields: [authorId], references: [id])
+//   authorId  Int
+// }
+
+model User {
+  id         String    @id @default(uuid())
+  name       String
+  email      String    @unique
+  password   String
+  isVerified Boolean   @default(false)
+  otp        String?
+  otpExpiry  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  role   String
+  vendor Vendor?
+  orders Order[]
+}
+
+model Vendor {
+  id       String    @id @default(uuid())
+  user_id  String    @unique
+  user     User      @relation(fields: [user_id], references: [id])
+  products Product[]
+}
+
+model Product {
+  id            String  @id @default(uuid())
+  productName   String
+  stockQuantity Int
+  price         Int
+  vendor_id     String
+  author        Vendor  @relation(fields: [vendor_id], references: [id])
+  orders        Order[]
+}
+
+model Order {
+  id              String    @id @default(uuid())
+  status          String // pending or confirm
+  totalAmount     Int
+  orderDate       DateTime  @default(now())
+  shippingAddress String
+  products        Product[]
+  userId          String?
+  user            User?     @relation(fields: [userId], references: [id])
+}
